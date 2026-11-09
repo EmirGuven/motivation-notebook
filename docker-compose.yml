@@ -1,7 +1,19 @@
 services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-motivasyondefteri}
+      POSTGRES_USER: ${POSTGRES_USER:-motivasyon_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - motivasyondefteri_pgdata:/var/lib/postgresql/data
+
   api:
     build: ./backend/Crm.Api
     restart: unless-stopped
+    depends_on:
+      - postgres
     ports:
       - "5080:5080"
     environment:
@@ -21,3 +33,6 @@ services:
       - api
     ports:
       - "8080:80"
+
+volumes:
+  motivasyondefteri_pgdata:
