@@ -72,3 +72,4 @@ networks:
 
 volumes:
   motivasyondefteri_pgdata:
+    name: motivasyondefteri_pgdata
