@@ -1,4 +1,4 @@
-name: Deploy Vue App
+name: Deploy App
 
 on:
   push:
@@ -23,8 +23,8 @@ jobs:
           script: |
             set -e
 
-            APP_DIR="/srv/docker/apps/aydinautoglas-web"
-            REPO="git@github.com:EmirGuven/aydinautoglas-web.git"
+            APP_DIR="/srv/docker/apps/motivasyondefteri"
+            REPO="git@github.com:EmirGuven/motivation-notebook.git"
 
             echo "📁 Preparing application directory..."
             mkdir -p "$APP_DIR"
