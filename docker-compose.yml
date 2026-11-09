@@ -14,25 +14,61 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
-    ports:
-      - "5080:5080"
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__Default: ${DB_CONNECTION}
       Auth__Username: ${AUTH_USERNAME:-admin}
       Auth__Password: ${AUTH_PASSWORD:-admin123}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      - "traefik.http.routers.motivasyondefteri-api.rule=Host(`salesapi.medigoport.com`)"
+      - "traefik.http.routers.motivasyondefteri-api.entrypoints=web"
+      - "traefik.http.routers.motivasyondefteri-api.service=motivasyondefteri-api"
+
+      - "traefik.http.routers.motivasyondefteri-api-secure.rule=Host(`salesapi.medigoport.com`)"
+      - "traefik.http.routers.motivasyondefteri-api-secure.entrypoints=websecure"
+      - "traefik.http.routers.motivasyondefteri-api-secure.tls=true"
+      - "traefik.http.routers.motivasyondefteri-api-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.motivasyondefteri-api-secure.service=motivasyondefteri-api"
+
+      - "traefik.http.services.motivasyondefteri-api.loadbalancer.server.port=5080"
+    networks:
+      - proxy
+      - default
 
   web:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: ${VITE_API_URL:-}
+        VITE_API_URL: ${VITE_API_URL:-https://salesapi.medigoport.com}
     restart: unless-stopped
     depends_on:
       - api
-    ports:
-      - "8080:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      - "traefik.http.routers.motivasyondefteri-web.rule=Host(`sales.medigoport.com`)"
+      - "traefik.http.routers.motivasyondefteri-web.entrypoints=web"
+      - "traefik.http.routers.motivasyondefteri-web.service=motivasyondefteri-web"
+
+      - "traefik.http.routers.motivasyondefteri-web-secure.rule=Host(`sales.medigoport.com`)"
+      - "traefik.http.routers.motivasyondefteri-web-secure.entrypoints=websecure"
+      - "traefik.http.routers.motivasyondefteri-web-secure.tls=true"
+      - "traefik.http.routers.motivasyondefteri-web-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.motivasyondefteri-web-secure.service=motivasyondefteri-web"
+
+      - "traefik.http.services.motivasyondefteri-web.loadbalancer.server.port=80"
+    networks:
+      - proxy
+      - default
+
+networks:
+  proxy:
+    external: true
 
 volumes:
   motivasyondefteri_pgdata:
