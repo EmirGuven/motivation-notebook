@@ -1,0 +1,23 @@
+services:
+  api:
+    build: ./backend/Crm.Api
+    restart: unless-stopped
+    ports:
+      - "5080:5080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: ${DB_CONNECTION}
+      Auth__Username: ${AUTH_USERNAME:-admin}
+      Auth__Password: ${AUTH_PASSWORD:-admin123}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "8080:80"

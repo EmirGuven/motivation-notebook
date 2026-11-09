@@ -1,0 +1,23 @@
+# Veritabanı: gerçek hasta verisi içerir, repoya girmemeli
+*.db
+*.db-shm
+*.db-wal
+
+# Gizli anahtarlar / yerel ayarlar (örn. Anthropic:ApiKey buraya yazılabilir)
+.env
+.env.*
+backend/Crm.Api/appsettings.Development.json
+
+# .NET
+bin/
+obj/
+
+# Node / Vite
+node_modules/
+dist/
+*.tsbuildinfo
+.vite/
+
+# Genel
+.DS_Store
+*.log

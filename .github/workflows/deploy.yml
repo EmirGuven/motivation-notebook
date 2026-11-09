@@ -1,0 +1,50 @@
+name: Deploy Vue App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: dev
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+
+            APP_DIR="/srv/docker/apps/aydinautoglas-web"
+            REPO="git@github.com:EmirGuven/aydinautoglas-web.git"
+
+            echo "📁 Preparing application directory..."
+            mkdir -p "$APP_DIR"
+            cd "$APP_DIR"
+
+            echo "📦 Checking repository..."
+
+            if [ ! -d ".git" ]; then
+              echo "⬇️ Cloning repository..."
+              git clone "$REPO" .
+            else
+              echo "🔄 Pulling latest changes..."
+              git fetch origin
+              git reset --hard origin/main
+            fi
+
+            echo "🐳 Building and starting containers..."
+            docker compose up -d --build
+
+            echo "🧹 Cleaning unused docker images..."
+            docker image prune -f
+
+            echo "✅ Deploy completed successfully"
